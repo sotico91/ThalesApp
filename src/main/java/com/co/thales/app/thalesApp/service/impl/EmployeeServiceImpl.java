@@ -16,6 +16,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
 
 @Service
 public class EmployeeServiceImpl implements EmployeeService {
@@ -33,21 +34,16 @@ public class EmployeeServiceImpl implements EmployeeService {
         this.objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
 
+    private static final int MAX_RETRIES = 3;
+    private static final long BACKOFF_DELAY_MS = 1000;
+
     public CompletableFuture<List<Employee>> getAllEmployees() {
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(BASE_URL + "/employees"))
                 .GET()
                 .build();
 
-        return httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString())
-                .thenApply(response -> {
-                    if (response.statusCode() == 200) {
-                        return parseEmployeeList(response.body());
-                    } else {
-                        logger.error("Failed to fetch employees, status code: {}", response.statusCode());
-                        throw new RuntimeException("Failed to fetch employees, status code: " + response.statusCode());
-                    }
-                });
+        return sendRequestWithRetry(request, this::parseEmployeeList);
     }
 
     public CompletableFuture<Employee> getEmployeeById(Long id) {
@@ -56,9 +52,32 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .GET()
                 .build();
 
-        return httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString())
-                .thenApply(HttpResponse::body)
-                .thenApply(this::parseEmployee);
+        return sendRequestWithRetry(request, this::parseEmployee);
+    }
+
+    private <T> CompletableFuture<T> sendRequestWithRetry(HttpRequest request, Function<String, T> parser) {
+        return CompletableFuture.supplyAsync(() -> {
+            int attempts = 0;
+            while (attempts < MAX_RETRIES) {
+                try {
+                    HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+                    if (response.statusCode() == 200) {
+                        return parser.apply(response.body());
+                    } else if (response.statusCode() == 429) {
+                        logger.warn("Rate limit exceeded, retrying... Attempt: {}", attempts + 1);
+                        Thread.sleep(BACKOFF_DELAY_MS * (attempts + 1));
+                    } else {
+                        logger.error("Failed to fetch data, status code: {}", response.statusCode());
+                        throw new RuntimeException("Failed to fetch data, status code: " + response.statusCode());
+                    }
+                } catch (Exception e) {
+                    logger.error("Error during request", e);
+                    throw new RuntimeException("Error during request", e);
+                }
+                attempts++;
+            }
+            throw new RuntimeException("Max retries reached, unable to fetch data");
+        });
     }
 
     private List<Employee> parseEmployeeList(String json) {

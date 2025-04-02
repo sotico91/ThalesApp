@@ -8,8 +8,14 @@ import lombok.Setter;
 @Getter
 public class Employee {
 
+    @JsonProperty("employee_name")
+    private String name;
+
     @JsonProperty("employee_salary")
     private Double salary;
+
+    @JsonProperty("employee_age")
+    private Integer age;
 
     private Double annualSalary;
 }
