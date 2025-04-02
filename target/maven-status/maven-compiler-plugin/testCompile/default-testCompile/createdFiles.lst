@@ -1,1 +1,7 @@
+com/co/thales/app/thalesApp/model/EmployeeTest.class
+com/co/thales/app/thalesApp/business/EmployeeBusinessBeanTest.class
+com/co/thales/app/thalesApp/service/EmployeeServiceTest.class
+com/co/thales/app/thalesApp/controller/EmployeeControllerTest.class
+com/co/thales/app/thalesApp/model/ApiResponseTest.class
+com/co/thales/app/thalesApp/service/impl/EmployeeServiceImplTest.class
 com/co/thales/app/thalesApp/ThalesAppApplicationTests.class

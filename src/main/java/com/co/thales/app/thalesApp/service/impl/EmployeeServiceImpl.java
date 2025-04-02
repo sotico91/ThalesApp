@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.net.URI;
@@ -26,12 +27,15 @@ public class EmployeeServiceImpl implements EmployeeService {
     private static final String BASE_URL = "http://dummy.restapiexample.com/api/v1";
     private final HttpClient httpClient;
     private final ObjectMapper objectMapper;
+    private final EmployeeMockDataProvider mockDataProvider;
 
-    public EmployeeServiceImpl() {
+    @Autowired
+    public EmployeeServiceImpl(EmployeeMockDataProvider mockDataProvider) {
         this.httpClient = HttpClient.newHttpClient();
         this.objectMapper = new ObjectMapper();
         // Configure ObjectMapper to ignore unknown properties
         this.objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        this.mockDataProvider = mockDataProvider;
     }
 
     private static final int MAX_RETRIES = 3;
@@ -43,7 +47,11 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .GET()
                 .build();
 
-        return sendRequestWithRetry(request, this::parseEmployeeList);
+        return sendRequestWithRetry(request, this::parseEmployeeList)
+                .exceptionally(ex -> {
+                    logger.warn("Failed to get employees from API after retries, using mock data", ex);
+                    return mockDataProvider.getAllEmployees();
+                });
     }
 
     public CompletableFuture<Employee> getEmployeeById(Long id) {
@@ -52,7 +60,11 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .GET()
                 .build();
 
-        return sendRequestWithRetry(request, this::parseEmployee);
+        return sendRequestWithRetry(request, this::parseEmployee)
+                .exceptionally(ex -> {
+                    logger.warn("Failed to get employee with id {} from API after retries, using mock data", id, ex);
+                    return mockDataProvider.getEmployeeById(id);
+                });
     }
 
     private <T> CompletableFuture<T> sendRequestWithRetry(HttpRequest request, Function<String, T> parser) {

@@ -1,1 +1,7 @@
 /Users/macbookpro/Documents/GitHub/ThalesApp/src/test/java/com/co/thales/app/thalesApp/ThalesAppApplicationTests.java
+/Users/macbookpro/Documents/GitHub/ThalesApp/src/test/java/com/co/thales/app/thalesApp/model/EmployeeTest.java
+/Users/macbookpro/Documents/GitHub/ThalesApp/src/test/java/com/co/thales/app/thalesApp/service/EmployeeServiceTest.java
+/Users/macbookpro/Documents/GitHub/ThalesApp/src/test/java/com/co/thales/app/thalesApp/business/EmployeeBusinessBeanTest.java
+/Users/macbookpro/Documents/GitHub/ThalesApp/src/test/java/com/co/thales/app/thalesApp/service/impl/EmployeeServiceImplTest.java
+/Users/macbookpro/Documents/GitHub/ThalesApp/src/test/java/com/co/thales/app/thalesApp/controller/EmployeeControllerTest.java
+/Users/macbookpro/Documents/GitHub/ThalesApp/src/test/java/com/co/thales/app/thalesApp/model/ApiResponseTest.java
