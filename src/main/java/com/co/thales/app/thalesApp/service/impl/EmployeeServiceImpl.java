@@ -33,7 +33,6 @@ public class EmployeeServiceImpl implements EmployeeService {
     public EmployeeServiceImpl(EmployeeMockDataProvider mockDataProvider) {
         this.httpClient = HttpClient.newHttpClient();
         this.objectMapper = new ObjectMapper();
-        // Configure ObjectMapper to ignore unknown properties
         this.objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         this.mockDataProvider = mockDataProvider;
     }

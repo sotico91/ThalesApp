@@ -22,7 +22,7 @@ public class EmployeeMockDataProvider {
     }
     
     private void initializeMockData() {
-        // Create some mock employees
+
         addEmployee(1L, "Tiger Nixon", 320800.0, 61);
         addEmployee(2L, "Garrett Winters", 170750.0, 63);
         addEmployee(3L, "Ashton Cox", 86000.0, 66);
@@ -33,7 +33,7 @@ public class EmployeeMockDataProvider {
         addEmployee(8L, "Rhona Davidson", 327900.2, 55);
         addEmployee(9L, "Colleen Hurst", 205500.0, 39);
         addEmployee(10L, "Sonya Frost", 103600.1, 23);
-        // Add more mock employees as needed
+
     }
     
     private void addEmployee(Long id, String name, Double salary, Integer age) {
@@ -41,7 +41,7 @@ public class EmployeeMockDataProvider {
         employee.setName(name);
         employee.setSalary(salary);
         employee.setAge(age);
-        employee.setAnnualSalary(salary * 12); // Calculate annual salary
+        employee.setAnnualSalary(salary * 12);
         mockEmployees.put(id, employee);
     }
     
@@ -54,7 +54,6 @@ public class EmployeeMockDataProvider {
         logger.info("Returning mock data for employee with id: {}", id);
         Employee employee = mockEmployees.get(id);
         if (employee == null) {
-            // If employee not found in mock data, create a default one
             employee = new Employee();
             employee.setName("Mock Employee " + id);
             employee.setSalary(50000.0);
